@@ -45,11 +45,11 @@ def handle_message(message):
 
 def generate_summary(messages, num_messages):
     history = str(messages[-num_messages:])
-    prompt = f"""
+    prompt = """
     Your task is generate a summary of the chat history contained between the triple backticks in the same language the chat history is in.
     
-    Chat history: ```{history}```
-    """
+    Chat history: ```%s```
+    """ % (prompt)
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         temperature=0,
