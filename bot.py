@@ -62,4 +62,5 @@ def generate_summary(messages, num_messages):
     summary = response.choices[0].message.content
     return summary
 
+print("Bot is running")
 bot.polling()
