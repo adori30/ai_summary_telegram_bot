@@ -18,7 +18,6 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_message(message):
-    print('ehy')
     chat_id = message.chat.id
     chat_history.append({"user": message.from_user.first_name, "message": message.text})
     print(str(chat_history))
@@ -45,11 +44,30 @@ def handle_message(message):
 
 def generate_summary(messages, num_messages):
     history = str(messages[-num_messages:])
+    language = find_language(history)
     prompt = f"""
-    Your task is generate a summary of the chat history contained between the triple backticks in the same language the chat history is in.
-    
+    Your task is generate a summary of the chat history contained between the triple backticks.
+    Write the summary in {language}
+
     Chat history: ```{history}```
     """
+    summary = get_response(prompt)
+    return summary
+
+def find_language(history):
+    prompt =  f"""
+    Your task is to determine the main language that is used in the chat history that is contained
+    between triple backticks. Look only at the "message" keys of the json object.
+    If you find more than one languange only answer with the main one that is used.
+    Your response will be a single word with the language name.
+    ```{history}``` 
+    """
+    language = get_response(prompt)
+    print(f"Language: {language}")
+    return language
+
+
+def get_response(prompt):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         temperature=0,
@@ -58,9 +76,8 @@ def generate_summary(messages, num_messages):
             {"role": "user", "content": prompt}
         ]
     )
-    print(response)
-    summary = response.choices[0].message.content
-    return summary
+    return response.choices[0].message.content
+
 
 print("Bot is running")
 bot.polling()
